@@ -1,0 +1,63 @@
+/* cashier.css */
+
+/* Body layout */
+body {
+  display: flex; /* Flexbox layout for sidebar and main content */
+  font-family: Arial, sans-serif; /* Font style */
+  background-color: #f8f9fa; /* Light background color */
+  margin: 0; /* Remove default margin */
+  height: 100vh; /* Full height */
+}
+
+.header {
+  background-color: #343a40; /* Header background color */
+  color: white; /* Header text color */
+  padding: 15px 20px; /* Padding for header */
+  text-align: center; /* Center align text */
+  position: fixed; /* Fixed position */
+  width: 100%; /* Full width */
+  z-index: 1000; /* Ensure header is above other content */
+}
+
+.header .logout-btn {
+  position: absolute; /* Position absolute for placement */
+  right: 20px; /* Align to right */
+  top: 15px; /* Align to top */
+  background-color: #dc3545; /* Logout button color */
+  color: white; /* Logout button text color */
+  border: none; /* Remove border */
+  padding: 8px 12px; /* Padding for button */
+  cursor: pointer; /* Cursor change on hover */
+  border-radius: 5px; /* Rounded edges for the button */
+}
+
+.sidebar {
+  background-color: #343a40; /* Dark sidebar color */
+  color: white; /* Sidebar text color */
+  width: 250px; /* Fixed width for sidebar */
+  height: 100vh; /* Full height */
+  padding: 20px; /* Padding for sidebar */
+  position: fixed; /* Fix sidebar position */
+  top: 60px; /* Align sidebar below header */
+  left: 0; /* Align sidebar to left */
+  overflow-y: auto; /* Allow vertical scrolling if content overflows */
+}
+
+.main-content {
+  margin-left: 260px; /* Add margin for the sidebar */
+  padding: 20px; /* Padding for main content */
+  flex-grow: 1; /* Allow main content to grow */
+  margin-top: 60px; /* Space for header */
+}
+
+.section {
+  background-color: white; /* White background for sections */
+  padding: 20px; /* Padding for sections */
+  border-radius: 5px; /* Rounded corners */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Box shadow for depth */
+  margin-bottom: 20px; /* Space between sections */
+}
+
+.section h2 {
+  margin-bottom: 15px; /* Space below section title */
+}
