@@ -1,33 +1,53 @@
 <?php
-include '../conn/connection.php'; // Database connection
+/*
+include '../conn/connection.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_status'])) {
     $order_id = $_POST['order_id'];
-    $table_num = $_POST['table_id']; // Get the table number
-    $new_status = $_POST['status'];
+    $status = $_POST['status'];
 
-    // Update order status
-    $update_order_sql = "UPDATE orderss SET status = ? WHERE order_id = ?";
-    $stmt = $conn->prepare($update_order_sql);
-    $stmt->bind_param("si", $new_status, $order_id);
+    $sql = "UPDATE orderss SET status = ? WHERE order_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("si", $status, $order_id);
 
     if ($stmt->execute()) {
-        // If status is 'Completed', set the table to 'Available'
-        if ($new_status === 'Completed') {
-            $update_table_sql = "UPDATE tables SET status = 'Available' WHERE table_num = ?";
-            $stmt_table = $conn->prepare($update_table_sql);
-            $stmt_table->bind_param("i", $table_num);
-            $stmt_table->execute();
-        }
-
-        // Redirect with success message
-        header("Location: dashboard.php?message=Order+status+updated+successfully&alert=success");
+        header("Location: customer_orders.php?status=success");
+        exit();
     } else {
-        // Redirect with error message
-        header("Location: dashboard.php?message=Error+updating+status&alert=danger");
+        header("Location: customer_orders.php?status=error");
+        exit();
+    }
+}
+?>*/
+
+include '../conn/connection.php'; // Database connection
+
+if (isset($_POST['update_status'])) {
+    $order_id = $_POST['order_id'];
+    $status = $_POST['status'];
+    $table_status = $_POST['table_status']; // Get the new table status from the form
+
+    // Update the order status
+    $sql = "UPDATE orderss SET status = ? WHERE order_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("si", $status, $order_id);
+    $stmt->execute();
+
+    // Update the table status based on the new order status
+    if ($status == 'Completed') {
+        $table_status = 'Available'; // Table can be marked as available after completion
+    } elseif ($status == 'Pending') {
+        $table_status = 'Occupied'; // Table is still occupied
     }
 
-    $stmt->close();
-    $conn->close();
+    $sqlUpdateTable = "UPDATE tables SET status = ? WHERE table_id = (SELECT table_id FROM orderss WHERE order_id = ?)";
+    $stmt = $conn->prepare($sqlUpdateTable);
+    $stmt->bind_param("si", $table_status, $order_id);
+    $stmt->execute();
+
+    // Redirect or show success message
+    header("Location: customer_order.php?success=Order status updated successfully.");
+    exit();
 }
 ?>
+

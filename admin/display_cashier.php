@@ -1,29 +1,33 @@
 <?php
 session_start(); // Start the session
-include '../conn/connection.php'; // Include your database connection file
+include '../conn/connection.php'; // Include your database connection
 
 // Fetch cashier details from the cashiers table
-$query = "SELECT cashiers.cashier_id, users.username AS cashier_name, users.email, cashiers.shift FROM cashiers JOIN users ON cashiers.user_id = users.user_id";
+$query = "SELECT cashiers.cashier_id, users.username AS cashier_name, users.email, cashiers.shift, cashiers.status 
+          FROM cashiers 
+          JOIN users ON cashiers.user_id = users.user_id";
 $result = $conn->query($query);
 
-// Handle delete action if the request is made
-if (isset($_GET['delete_id'])) {
-    $delete_id = $_GET['delete_id'];
+// Fetch all assigned cashiers from the orders table
+$assigned_cashiers_query = "SELECT DISTINCT c.cashier_id, u.username AS cashier_name 
+                             FROM orderss o 
+                             JOIN cashiers c ON o.cashier_id = c.cashier_id 
+                             JOIN users u ON c.user_id = u.user_id";
 
-    // Prepare the delete query
-    $delete_query = "DELETE FROM cashiers WHERE cashier_id = ?";
-    $stmt = $conn->prepare($delete_query);
-    $stmt->bind_param("i", $delete_id);
+$assigned_cashiers_result = $conn->query($assigned_cashiers_query);
 
-    if ($stmt->execute()) {
-        // Successfully deleted, redirect or display a success message
-        echo "<script>alert('Cashier deleted successfully.'); window.location.href='display_cashier.php';</script>";
-    } else {
-        echo "<script>alert('Error deleting cashier.');</script>";
-    }
-    
-    $stmt->close(); // Close the statement
-}
+// Fetch the latest assigned cashier from the orders table
+$latest_cashier_query = "SELECT u.username AS cashier_name 
+                          FROM orderss o 
+                          JOIN cashiers c ON o.cashier_id = c.cashier_id 
+                          JOIN users u ON c.user_id = u.user_id 
+                          ORDER BY o.order_date DESC 
+                          LIMIT 1";
+
+$latest_cashier_result = $conn->query($latest_cashier_query);
+$latest_cashier = ($latest_cashier_result && $latest_cashier_result->num_rows > 0) 
+                  ? $latest_cashier_result->fetch_assoc()['cashier_name'] 
+                  : "None";
 ?>
 
 <!DOCTYPE html>
@@ -35,7 +39,7 @@ if (isset($_GET['delete_id'])) {
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background-color: #f4f4f4; /* Subtle background color */
+            background-color: #f4f4f4;
         }
         h2 {
             text-align: center;
@@ -46,8 +50,8 @@ if (isset($_GET['delete_id'])) {
             margin: 20px auto;
             width: 90%;
             border-collapse: collapse;
-            background-color: #ffffff; /* White table background */
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Soft shadow */
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             border-radius: 5px;
         }
         th, td {
@@ -55,38 +59,31 @@ if (isset($_GET['delete_id'])) {
             text-align: center;
         }
         th {
-            background-color: #838F9E; 
+            background-color: #838F9E;
             color: white;
         }
         tr:nth-child(even) {
-            background-color: #e9ecef; 
-        }
-        .register-link {
-            text-align: center;
-            margin: 20px;
-        }
-        .register-link a {
-            text-decoration: none;
-            color: #007bff;
-            font-weight: bold; 
-        }
-        .register-link a:hover {
-            text-decoration: underline;
-            color: #0056b3; 
-        }
-        .btn-danger {
-            background-color: #dc3545; 
-            border-color: #dc3545;
-        }
-        .btn-danger:hover {
-            background-color: #c82333; 
-            border-color: #bd2130; 
+            background-color: #e9ecef;
         }
     </style>
 </head>
 <body>
 
-<h2>List of Cashiers</h2>
+<h2>List of Assigned Cashiers</h2>
+
+<p style="text-align:center; font-weight: bold;">
+    Assigned Cashiers: 
+    <?php 
+    if ($assigned_cashiers_result->num_rows > 0) {
+        while ($row = $assigned_cashiers_result->fetch_assoc()) {
+            echo $row['cashier_name'] . " (ID: " . $row['cashier_id'] . ") ";
+        }
+    } else {
+        echo "None";
+    }
+    ?><br>
+    Latest Cashier from Orders: <?php echo $latest_cashier; ?>
+</p>
 
 <table border="1" class="table table-bordered table-striped">
     <tr>
@@ -94,6 +91,7 @@ if (isset($_GET['delete_id'])) {
         <th>Name</th>
         <th>Email</th>
         <th>Shift</th>
+        <th>Status</th>
         <th>Action</th>
     </tr>
     <?php
@@ -104,20 +102,18 @@ if (isset($_GET['delete_id'])) {
                     <td>{$row['cashier_name']}</td>
                     <td>{$row['email']}</td>
                     <td>{$row['shift']}</td>
+                    <td>{$row['status']}</td>
                     <td>
-                        <a href='?delete_id={$row['cashier_id']}' class='btn btn-danger btn-sm' onclick='return confirm(\"Are you sure you want to delete this cashier?\");'>Delete</a>
+                        <a href='?delete_id={$row['cashier_id']}' class='btn btn-danger btn-sm' 
+                           onclick='return confirm(\"Are you sure you want to delete this cashier?\");'>Delete</a>
                     </td>
                   </tr>";
         }
     } else {
-        echo "<tr><td colspan='5'>No cashiers found</td></tr>";
+        echo "<tr><td colspan='6'>No cashiers found</td></tr>";
     }
     ?>
 </table>
-
-<div class="register-link">
-    <p><a href="register_cashier.php">Register New Cashier</a></p>
-</div>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>

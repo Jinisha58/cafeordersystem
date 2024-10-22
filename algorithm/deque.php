@@ -1,34 +1,21 @@
 <?php
 class Deque {
+
     private $items = [];
-    private $conn;
 
-    public function __construct($dbConnection) {
-        $this->conn = $dbConnection;
-        $this->loadOrdersFromDB();
+    public function addFront($item) {
+        array_unshift($this->items, $item);
     }
 
-    private function loadOrdersFromDB() {
-        $query = "SELECT * FROM orders WHERE status = 'pending' ORDER BY order_time ASC";
-        $result = $this->conn->query($query);
-        while ($order = $result->fetch_assoc()) {
-            $this->items[] = $order;
-        }
-    }
-
-    public function addFront($order) {
-        array_unshift($this->items, $order);
-    }
-
-    public function addBack($order) {
-        array_push($this->items, $order);
+    public function addRear($item) {
+        $this->items[] = $item;
     }
 
     public function removeFront() {
         return array_shift($this->items);
     }
 
-    public function removeBack() {
+    public function removeRear() {
         return array_pop($this->items);
     }
 
@@ -36,20 +23,29 @@ class Deque {
         return empty($this->items);
     }
 
-    public function getOrders() {
-        return $this->items;
-    }
-
     public function size() {
         return count($this->items);
     }
 
-    public function completeOrder($orderId) {
-        $query = "UPDATE orders SET status = 'completed' WHERE order_id = ?";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("i", $orderId);
-        $stmt->execute();
-        $stmt->close();
+    public function getItems() {
+        return $this->items;
+    }
+}
+
+class Order {
+    public $order_id;
+    public $customer_name;
+    public $items = [];
+
+    public function __construct($order_id,
+        $customer_name,
+        $item_name, $quantity) {
+        $this->order_id = $order_id;
+        $this->customer_name = $customer_name;
+        $this->items[] = [
+            'item_name' => $item_name,
+            'quantity' => $quantity
+        ];
     }
 }
 ?>
