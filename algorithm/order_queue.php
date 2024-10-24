@@ -28,7 +28,7 @@ function assignQueuedOrdersToCashier() {
                    COUNT(o.order_id) AS workload 
             FROM cashiers c
             LEFT JOIN users u ON c.user_id = u.user_id
-            LEFT JOIN orderss o ON c.cashier_id = o.cashier_id 
+            LEFT JOIN orders o ON c.cashier_id = o.cashier_id 
             GROUP BY c.cashier_id 
             ORDER BY workload ASC 
             LIMIT 1";
@@ -40,8 +40,8 @@ function assignQueuedOrdersToCashier() {
                 $cashier_id = $cashier['cashier_id'];
                 $cashier_name = $cashier['cashier_name']; // Fetch cashier name
 
-                // Step 2: Insert the new order into orderss
-                $order_query = "INSERT INTO orderss (cashier_id, customer_name, table_id, order_date, total_price, status) 
+                // Step 2: Insert the new order into orders
+                $order_query = "INSERT INTO orders (cashier_id, customer_name, table_id, order_date, total_price, status) 
                                 VALUES ('$cashier_id', '$customer_name', '$table_id', '$order_date', '$total_price', '$status')";
 
                 if ($conn->query($order_query) === TRUE) {

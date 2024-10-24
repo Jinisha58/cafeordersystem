@@ -14,7 +14,7 @@
 <div class="section" id="customers" style="display: none;">
     <h2>Manage Customers</h2>
     <!-- Add customer management content here -->
-     <?php include('customer_order.php'); ?>
+     <?php include('customer_orders.php'); ?>
 </div>
 
 

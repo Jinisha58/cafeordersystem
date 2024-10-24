@@ -7,7 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
     $new_status = $_POST['status'];
 
     // Fetch the table ID associated with the order
-    $sql = "SELECT table_id FROM orderss WHERE order_id = '$order_id'";
+    $sql = "SELECT table_id FROM orders WHERE order_id = '$order_id'";
     $result = $conn->query($sql);
 
     if ($result && $result->num_rows > 0) {
@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
         error_log("Table ID: $table_id"); // Log the table ID for debugging
 
         // Update the order status
-        $update_order_sql = "UPDATE orderss SET status = '$new_status' WHERE order_id = '$order_id'";
+        $update_order_sql = "UPDATE orders SET status = '$new_status' WHERE order_id = '$order_id'";
         if ($conn->query($update_order_sql) === TRUE) {
             // Check if the new status is 'Completed'
             if ($new_status === 'Completed') {

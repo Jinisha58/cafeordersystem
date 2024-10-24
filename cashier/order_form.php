@@ -2,6 +2,7 @@
 <?php
 // Include database connection
 include '../conn/connection.php';
+include 'dashboard_flex.php';
 
 // Fetch available tables
 $tables_query = "SELECT table_id, table_num FROM tables WHERE status = 'available'";
@@ -12,12 +13,7 @@ $menu_query = "SELECT item_id, item_name, price FROM menu";
 $menu_result = mysqli_query($conn, $menu_query);
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cafe Order Form</title>
+
     <style>
         .order-form {
             max-width: 600px;
@@ -93,8 +89,7 @@ $menu_result = mysqli_query($conn, $menu_query);
             document.getElementById('total_price').value = total.toFixed(2);
         }
     </script>
-</head>
-<body>
+
     <div class="order-form">
         <h2>Place an Order</h2>
         <form action="process_order.php" method="POST">
@@ -149,6 +144,7 @@ $menu_result = mysqli_query($conn, $menu_query);
             </div>
         </form>
     </div>
+                </div>
 </body>
 </html> 
 

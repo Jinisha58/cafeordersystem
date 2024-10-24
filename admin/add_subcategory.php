@@ -1,7 +1,7 @@
 <?php
 // Include the database connection
 include('../conn/connection.php');
-
+include('dashboard_flex.php');
 // Fetch categories for the dropdown
 $categories = [];
 $sql = "SELECT id, category_name FROM category";
@@ -59,12 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 $conn->close();
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Subcategory</title>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -124,8 +119,7 @@ $conn->close();
             background-color: #218838;
         }
     </style>
-</head>
-<body>
+
 
 <h2>Add Subcategory</h2>
 <form action="add_subcategory.php" method="POST" enctype="multipart/form-data">
@@ -148,6 +142,7 @@ $conn->close();
    
     <input type="submit" value="Add Subcategory">
 </form>
+        </div>
 
 </body>
 </html>

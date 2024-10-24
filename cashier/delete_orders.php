@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_order'])) {
     mysqli_query($conn, $delete_items_query);
 
     // Delete order from orders table
-    $delete_order_query = "DELETE FROM orderss WHERE order_id = '$order_id'";
+    $delete_order_query = "DELETE FROM orders WHERE order_id = '$order_id'";
     if (mysqli_query($conn, $delete_order_query)) {
         header("Location: dashboard.php?message=Order deleted successfully&alert=success");
         exit();

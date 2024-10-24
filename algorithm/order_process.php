@@ -12,7 +12,7 @@ function assignOrderToCashier($customer_name, $table_id, $menu_items, $total_pri
            COUNT(o.order_id) AS workload 
     FROM cashiers c
     LEFT JOIN users u ON c.user_id = u.user_id
-    LEFT JOIN orderss o ON c.cashier_id = o.cashier_id 
+    LEFT JOIN orders o ON c.cashier_id = o.cashier_id 
     WHERE c.status = 'available'
     GROUP BY c.cashier_id 
     ORDER BY workload ASC 
@@ -28,7 +28,7 @@ function assignOrderToCashier($customer_name, $table_id, $menu_items, $total_pri
         // Step 2: Insert the new order
         $order_date = date('Y-m-d H:i:s');
         $status = 'Pending';
-        $order_query = "INSERT INTO orderss (cashier_id, customer_name, table_id, order_date, total_price, status) 
+        $order_query = "INSERT INTO orders (cashier_id, customer_name, table_id, order_date, total_price, status) 
                         VALUES ('$cashier_id', '$customer_name', '$table_id', '$order_date', '$total_price', '$status')";
 
         if ($conn->query($order_query) === TRUE) {

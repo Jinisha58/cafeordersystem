@@ -14,7 +14,7 @@ $sql = "
         (oi.quantity * m.price) AS item_total,
         SUM(oi.quantity * m.price) OVER (PARTITION BY o.order_id) AS order_total,
         c.cashier_name AS cashier_name  -- Fetch cashier name
-    FROM orderss o
+    FROM orders o
     JOIN tables t ON o.table_id = t.table_id
     JOIN order_items oi ON o.order_id = oi.order_id
     JOIN menu m ON oi.item_id = m.item_id

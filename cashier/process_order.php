@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $total_price = $_POST['total_price'];
 
     // Insert the order into the orders table
-    $order_query = "INSERT INTO orderss (customer_name, table_id, total_price, order_date) VALUES (?, ?, ?, NOW())"; // Ensure 'orders' is the correct table name
+    $order_query = "INSERT INTO orders (customer_name, table_id, total_price, order_date) VALUES (?, ?, ?, NOW())"; // Ensure 'orders' is the correct table name
     $stmt = $conn->prepare($order_query);
     $stmt->bind_param("sid", $customer_name, $table_id, $total_price);
 

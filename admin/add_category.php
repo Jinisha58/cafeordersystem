@@ -1,6 +1,7 @@
 <?php
 // Include the database connection
 include('../conn/connection.php');
+include ('dashboard_flex.php');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Get form data
@@ -32,12 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 $conn->close();
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Category - Cafe Order System</title>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -91,8 +87,7 @@ $conn->close();
             background-color: #218838;
         }
     </style>
-</head>
-<body>
+
 
 <h2>Add Category</h2>
 <form action="add_category.php" method="POST">
@@ -101,6 +96,7 @@ $conn->close();
 
     <input type="submit" value="Add Category">
 </form>
+</div>
 
 </body>
 </html>

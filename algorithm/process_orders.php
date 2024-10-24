@@ -23,7 +23,7 @@ $sql = "
         oi.quantity, 
         (oi.quantity * m.price) AS item_total,
         SUM(oi.quantity * m.price) OVER (PARTITION BY o.order_id) AS order_total
-    FROM orderss o
+    FROM orders o
     JOIN tables t ON o.table_id = t.table_id
     JOIN order_items oi ON o.order_id = oi.order_id
     JOIN menu m ON oi.item_id = m.item_id
@@ -67,8 +67,8 @@ while (!$ordersDeque->isEmpty()) {
 
 
 session_start();
-include '../conn/connection.php';  // Database connection
-include_once 'deque.php';  // Include the Deque class
+include '../conn/connection.php';  
+include_once 'deque.php';  
 
 // Initialize the deque in session if not already present
 if (!isset($_SESSION['orderDeque'])) {
@@ -83,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $total_price = $_POST['total_price'];
 
     // 2. Insert new order into the orders table
-    $insertOrderQuery = "INSERT INTO orderss (customer_name, table_id, total_price, status) 
+    $insertOrderQuery = "INSERT INTO orders (customer_name, table_id, total_price, status) 
                          VALUES ('$customer_name', $table_id, $total_price, 'pending')";
     mysqli_query($conn, $insertOrderQuery);
     $order_id = mysqli_insert_id($conn);  // Get the new order ID

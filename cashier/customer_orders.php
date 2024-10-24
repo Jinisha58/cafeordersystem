@@ -1,6 +1,7 @@
 
 <?php
 include '../conn/connection.php'; // Database connection
+include 'dashboard_flex.php';
 
 // Fetch all orders with their items, quantities, and total price
 $sql = "
@@ -14,7 +15,7 @@ $sql = "
         oi.quantity, 
         (oi.quantity * m.price) AS item_total,
         SUM(oi.quantity * m.price) OVER (PARTITION BY o.order_id) AS order_total
-    FROM orderss o
+    FROM orders o
     JOIN tables t ON o.table_id = t.table_id
     JOIN order_items oi ON o.order_id = oi.order_id
     JOIN menu m ON oi.item_id = m.item_id
@@ -27,12 +28,6 @@ if (!$result) {
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Orders</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
     .btn-group .btn {
@@ -40,8 +35,7 @@ if (!$result) {
     }
 </style>
 
-</head>
-<body>
+
 <div class="container mt-5">
     <h2>Customer Orders</h2>
 
@@ -174,6 +168,7 @@ if (!$result) {
         <p>No orders found.</p>
     <?php endif; ?>
 </div>
+    </div>
 
 <!-- Include Bootstrap JS and dependencies -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

@@ -1,17 +1,13 @@
 <?php
 include '../conn/connection.php';
+include 'dashboard_flex.php';
 
 // Fetch tables from the database
 $sql = "SELECT table_id, table_num, status, capacity FROM tables";
 $result = $conn->query($sql);
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cashier Table View</title>
+
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         .table-box {
@@ -30,8 +26,7 @@ $result = $conn->query($sql);
             border-color: #f5c6cb;
         }
     </style>
-</head>
-<body>
+
 <div class="container">
     <h2 class="mt-5">Tables</h2>
 
@@ -60,6 +55,7 @@ $result = $conn->query($sql);
             </div>
         <?php endif; ?>
     </div>
+</div>
 </div>
 </body>
 </html>

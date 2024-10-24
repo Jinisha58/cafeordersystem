@@ -1,5 +1,7 @@
 <?php
-include '../conn/connection.php'; // Include your database connection
+include '../conn/connection.php';
+ // Include your database connection
+ include 'dashboard_flex.php';
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -37,12 +39,7 @@ if ($result === false) {
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Café Orders</title>
+
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         .table-box {
@@ -75,12 +72,9 @@ if ($result === false) {
             text-decoration: none;
         }
     </style>
-</head>
-<body>
 
 <div class="container">
-    <h1 class="mt-5">Manage Tables</h1>
-    
+    <h4>Manage Tables</h4>
     <form method="post" action="add_table.php" class="mb-4">
         <label for="table_num">Table Number:</label>
         <input type="text" id="table_num" name="table_num" required>
@@ -126,6 +120,7 @@ if ($result === false) {
         <?php endif; ?>
     </div>
 </div>
+        </div>
 
 </body>
 </html>

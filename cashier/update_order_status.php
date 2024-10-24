@@ -6,7 +6,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_status'])) {
     $order_id = $_POST['order_id'];
     $status = $_POST['status'];
 
-    $sql = "UPDATE orderss SET status = ? WHERE order_id = ?";
+    $sql = "UPDATE orders SET status = ? WHERE order_id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("si", $status, $order_id);
 
@@ -28,7 +28,7 @@ if (isset($_POST['update_status'])) {
     $table_status = $_POST['table_status']; // Get the new table status from the form
 
     // Update the order status
-    $sql = "UPDATE orderss SET status = ? WHERE order_id = ?";
+    $sql = "UPDATE orders SET status = ? WHERE order_id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("si", $status, $order_id);
     $stmt->execute();
@@ -40,13 +40,13 @@ if (isset($_POST['update_status'])) {
         $table_status = 'Occupied'; // Table is still occupied
     }
 
-    $sqlUpdateTable = "UPDATE tables SET status = ? WHERE table_id = (SELECT table_id FROM orderss WHERE order_id = ?)";
+    $sqlUpdateTable = "UPDATE tables SET status = ? WHERE table_id = (SELECT table_id FROM orders WHERE order_id = ?)";
     $stmt = $conn->prepare($sqlUpdateTable);
     $stmt->bind_param("si", $table_status, $order_id);
     $stmt->execute();
 
     // Redirect or show success message
-    header("Location: customer_order.php?success=Order status updated successfully.");
+    header("Location: dashboard.php?success=Order status updated successfully.");
     exit();
 }
 ?>

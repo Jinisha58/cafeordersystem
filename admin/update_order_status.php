@@ -8,7 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
     $new_status = $_POST['status'];
 
     // Update order status
-    $update_order_sql = "UPDATE orderss SET status = ? WHERE order_id = ?";
+    $update_order_sql = "UPDATE orders SET status = ? WHERE order_id = ?";
     $stmt = $conn->prepare($update_order_sql);
     $stmt->bind_param("si", $new_status, $order_id);
 

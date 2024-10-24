@@ -9,10 +9,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_order'])) {
     $stmt->bind_param("i", $order_id);
 
     if ($stmt->execute()) {
-        header("Location: customer_orders.php?status=deleted");
+        header("Location: dashboard.php?status=deleted");
         exit();
     } else {
-        header("Location: customer_orders.php?status=error");
+        header("Location: dashboard.php?status=error");
         exit();
     }
 }

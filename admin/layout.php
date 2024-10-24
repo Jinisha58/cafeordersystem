@@ -6,7 +6,7 @@ include '../conn/connection.php';
 $totalOrders = $totalTables = $occupiedTables = $availableTables = 0;
 
 // Queries to get data
-$totalOrdersQuery = "SELECT COUNT(*) AS total_orders FROM orderss";
+$totalOrdersQuery = "SELECT COUNT(*) AS total_orders FROM orders";
 $totalTablesQuery = "SELECT COUNT(*) AS total_tables FROM tables";
 $occupiedTablesQuery = "SELECT COUNT(*) AS occupied_tables FROM tables WHERE status = 'occupied'";
 $availableTablesQuery = "SELECT COUNT(*) AS available_tables FROM tables WHERE status = 'available'";
