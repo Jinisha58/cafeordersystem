@@ -56,7 +56,7 @@ if ($result->num_rows > 0) {
         echo '<div class="menu-item-row" 
                   style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #ddd;">';
         echo '<div class="item-name" style="flex: 1; text-align: left;">' . htmlspecialchars($row['item_name']) . '</div>';
-        echo '<div class="item-price" style="flex: 0.2; text-align: right;">$' . htmlspecialchars($row['price']) . '</div>';
+        echo '<div class="item-price" style="flex: 0.2; text-align: right;">' . htmlspecialchars($row['price']) . '</div>';
         echo '</div>';
     }
 

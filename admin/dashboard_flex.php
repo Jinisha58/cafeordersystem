@@ -153,7 +153,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     <div>Admin Dashboard</div>
     <div class="nav-item">
       <span>Welcome, Admin</span>
-      <img src="https://via.placeholder.com/40" alt="Profile Picture">
+      <!--<img src="https://via.placeholder.com/40" alt="Profile Picture">-->
     </div>
   </div>
 

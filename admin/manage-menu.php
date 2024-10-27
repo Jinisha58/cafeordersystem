@@ -61,7 +61,7 @@ if ($result->num_rows > 0) {
                          border-bottom: 1px solid #e0e0e0; transition: background-color 0.3s;">';
         echo '<div class="item-name" style="flex: 1; text-align: left; color: #34495e;">' 
              . htmlspecialchars($row['item_name']) . '</div>';
-        echo '<div class="item-price" style="flex: 0.2; text-align: right; color: #27ae60; font-weight: 600;">$' 
+        echo '<div class="item-price" style="flex: 0.2; text-align: right; color: #27ae60; font-weight: 600;"> ' 
              . htmlspecialchars($row['price']) . '</div>';
         echo '</div>';
     }

@@ -13,13 +13,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt = $conn->prepare($sql);
 
     // Bind parameters
-    $stmt->bind_param('sdii', $item_name, $price, $subcategory_id, $category_id); // Updated to remove description
+    $stmt->bind_param('sdii', $item_name, $price, $subcategory_id, $category_id);
 
     // Execute the statement
     if ($stmt->execute()) {
-        echo "New record created successfully";
+        // Display success message and redirect to the dashboard
+        echo "<script>
+                alert('New record created successfully');
+                window.location.href = 'dashboard.php';
+              </script>";
     } else {
-        echo "Error: " . $stmt->error;
+        // Display error message and redirect to the dashboard
+        echo "<script>
+                alert('Error: " . $stmt->error . "');
+                window.location.href = 'dashboard.php';
+              </script>";
     }
 
     // Close the statement and connection

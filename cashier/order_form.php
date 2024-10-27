@@ -115,7 +115,7 @@ $menu_result = mysqli_query($conn, $menu_query);
                 <label for="menu_items">Select Menu Items:</label>
                 <?php while ($row = mysqli_fetch_assoc($menu_result)): ?>
                     <div class="menu-item">
-                        <span><?= $row['item_name']; ?> - $<?= $row['price']; ?></span>
+                        <span><?= $row['item_name']; ?> - <?= $row['price']; ?></span>
                         <input type="checkbox" 
                                name="items[<?= $row['item_id']; ?>][id]" 
                                value="<?= $row['item_id']; ?>" 
@@ -140,7 +140,7 @@ $menu_result = mysqli_query($conn, $menu_query);
             <!-- Form Buttons -->
             <div class="form-buttons">
                 <button type="submit" class="submit-btn">Place Order</button>
-                <button type="button" class="cancel-btn" onclick="window.location.href='index.php';">Cancel</button>
+                <button type="button" class="cancel-btn" onclick="window.location.href='dashboard.php';">Cancel</button>
             </div>
         </form>
     </div>

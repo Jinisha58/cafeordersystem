@@ -47,8 +47,8 @@ if (!$result) {
                     <th>Table Number</th>
                     <th>Item Name</th>
                     <th>Quantity</th>
-                    <th>Item Total ($)</th>
-                    <th>Order Total ($)</th>
+                    <th>Item Total </th>
+                    <th>Order Total </th>
                     <th>Order Date</th>
                     <th>Status</th>
                     <th>Action</th>
@@ -64,7 +64,7 @@ if (!$result) {
                 // Close previous order group with total row
                 echo "<tr>
                         <td colspan='9' class='text-right font-weight-bold'>Total Order Price:</td>
-                        <td class='text-right'>$" . number_format($orderTotal, 2) . "</td>
+                        <td class='text-right'>" . number_format($orderTotal, 2) . "</td>
                       </tr>";
             }
             $currentOrderId = $row['order_id'];
@@ -77,8 +77,8 @@ if (!$result) {
             <td><?php echo $isNewOrder ? $row['table_num'] : ''; ?></td>
             <td><?php echo $row['item_name']; ?></td>
             <td><?php echo $row['quantity']; ?></td>
-            <td class="text-right">$<?php echo number_format($row['item_total'], 2); ?></td>
-            <td class="text-right"><?php echo $isNewOrder ? "$" . number_format($row['order_total'], 2) : ''; ?></td>
+            <td class="text-right"><?php echo number_format($row['item_total'], 2); ?></td>
+            <td class="text-right"><?php echo $isNewOrder ? " " . number_format($row['order_total'], 2) : ''; ?></td>
             <td><?php echo $isNewOrder ? $row['order_date'] : ''; ?></td>
             <td>
                 <?php if ($isNewOrder): ?>
@@ -158,7 +158,7 @@ if (!$result) {
     <!-- Last order's total row -->
     <tr>
         <td colspan="9" class="text-right font-weight-bold">Total Order Price:</td>
-        <td class="text-right">$<?php echo number_format($orderTotal, 2); ?></td>
+        <td class="text-right"><?php echo number_format($orderTotal, 2); ?></td>
     </tr>
 </tbody>
 

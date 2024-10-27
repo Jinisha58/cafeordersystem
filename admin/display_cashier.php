@@ -56,23 +56,25 @@ $result = $conn->query($query);
         <th>Action</th>
     </tr>
     <?php
-    if ($result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
-            echo "<tr>
-                    <td>{$row['cashier_id']}</td>
-                    <td>{$row['cashier_name']}</td>
-                    <td>{$row['email']}</td>
-                    <td>{$row['shift']}</td>
-                    <td>
-                        <a href='?delete_id={$row['cashier_id']}' class='btn btn-danger btn-sm' 
-                           onclick='return confirm(\"Are you sure you want to delete this cashier?\");'>Delete</a>
-                    </td>
-                  </tr>";
-        }
-    } else {
-        echo "<tr><td colspan='5'>No cashiers found</td></tr>";
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        echo "<tr>
+                <td>{$row['cashier_id']}</td>
+                <td>{$row['cashier_name']}</td>
+                <td>{$row['email']}</td>
+                <td>{$row['shift']}</td>
+                <td>
+                    <a href='delete_cashier.php?delete_id={$row['cashier_id']}' 
+                       class='btn btn-danger btn-sm' 
+                       onclick='return confirm(\"Are you sure you want to delete this cashier?\");'>Delete</a>
+                </td>
+              </tr>";
     }
-    ?>
+} else {
+    echo "<tr><td colspan='5'>No cashiers found</td></tr>";
+}
+?>
+
 </table>
 </div>
 

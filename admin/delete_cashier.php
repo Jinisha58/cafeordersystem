@@ -27,6 +27,6 @@ if (isset($_GET['delete_id'])) {
 }
 
 // Redirect back to the cashier list page with a message
-header("Location: dashboard2.php?message=" . urlencode($message));
+header("Location: display_cashier.php?message=" . urlencode($message));
 exit; // Terminate the script
 ?>
