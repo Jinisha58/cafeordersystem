@@ -1,23 +1,19 @@
 <?php
-
-
 include '../conn/connection.php'; // Database connection
 
-// Fetch all orders with items, quantities, and totals using a subquery for order totals
-$sql = "
+// Fetch all orders with their items, quantities, and total price
+    $sql = "
     SELECT 
-        o.order_id, 
+        o.order_id AS order_id, 
         o.customer_name, 
         t.table_num, 
         o.order_date, 
         o.status, 
         m.item_name, 
+        oi.item_id,  -- Add item_id here
         oi.quantity, 
         (oi.quantity * m.price) AS item_total,
-        (SELECT SUM(oi2.quantity * m2.price)
-         FROM order_items oi2 
-         JOIN menu m2 ON oi2.item_id = m2.item_id 
-         WHERE oi2.order_id = o.order_id) AS order_total
+        SUM(oi.quantity * m.price) OVER (PARTITION BY o.order_id) AS order_total
     FROM orders o
     JOIN tables t ON o.table_id = t.table_id
     JOIN order_items oi ON o.order_id = oi.order_id
@@ -29,22 +25,60 @@ $result = $conn->query($sql);
 if (!$result) {
     die("Query Failed: " . $conn->error);  // Error handling
 }
+
+// Fetch historical data for forecasting
+$forecastSql = "
+    SELECT 
+        oi.item_id, 
+        SUM(oi.quantity) AS total_quantity, 
+        DATE(o.order_date) AS order_date 
+    FROM 
+        orders o 
+    JOIN 
+        order_items oi ON o.order_id = oi.order_id 
+    GROUP BY 
+        oi.item_id, DATE(o.order_date) 
+    ORDER BY 
+        order_date DESC
+";
+
+$forecastResult = $conn->query($forecastSql);
+
+$forecastData = [];
+if ($forecastResult && $forecastResult->num_rows > 0) {
+    while ($row = $forecastResult->fetch_assoc()) {
+        $forecastData[$row['item_id']][] = [
+            'date' => $row['order_date'],
+            'quantity' => $row['total_quantity']
+        ];
+    }
+}
+
+$forecastResults = [];
+foreach ($forecastData as $itemId => $data) {
+    $totalQuantity = 0;
+    $count = count($data);
+
+    // Calculate the total quantity for the last n days (e.g., last 7 days)
+    for ($i = 0; $i < min(7, $count); $i++) {
+        $totalQuantity += $data[$i]['quantity'];
+    }
+
+    // Calculate the average quantity
+    $averageQuantity = $totalQuantity / min(7, $count);
+
+    // Forecast for the next day
+    $forecastResults[$itemId] = round($averageQuantity);
+}
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Orders</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        .btn-group .btn {
-            margin-right: 5px;
-        }
-    </style>
-</head>
-<body>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<style>
+.btn-group .btn {
+    margin-right: 5px;
+}
+</style>
+
 <div class="container mt-5">
     <h2>Customer Orders</h2>
 
@@ -57,124 +91,88 @@ if (!$result) {
                     <th>Table Number</th>
                     <th>Item Name</th>
                     <th>Quantity</th>
-                    <th>Item Total ($)</th>
-                    <th>Order Total ($)</th>
+                    <th>Item Total</th>
+                    <th>Order Total</th>
                     <th>Order Date</th>
                     <th>Status</th>
+                    <th>Forecast Quantity</th> <!-- New Column -->
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody>
             <?php 
-            $currentOrderId = null;
-            while ($row = $result->fetch_assoc()): 
-                $isNewOrder = $currentOrderId !== $row['order_id'];
-                if ($isNewOrder) {
-                    $currentOrderId = $row['order_id'];
-                }
-            ?>
-                <tr>
-                    <td><?php echo $isNewOrder ? $row['order_id'] : ''; ?></td>
-                    <td><?php echo $isNewOrder ? $row['customer_name'] : ''; ?></td>
-                    <td><?php echo $isNewOrder ? $row['table_num'] : ''; ?></td>
-                    <td><?php echo $row['item_name']; ?></td>
-                    <td><?php echo $row['quantity']; ?></td>
-                    <td class="text-right">$<?php echo number_format($row['item_total'], 2); ?></td>
-                    <td class="text-right"><?php echo $isNewOrder ? "$" . number_format($row['order_total'], 2) : ''; ?></td>
-                    <td><?php echo $isNewOrder ? $row['order_date'] : ''; ?></td>
-                    <td>
-                        <?php if ($isNewOrder): ?>
-                            <span class="badge 
-                                <?php 
-                                    if ($row['status'] == 'Pending') echo 'badge-warning';
-                                    elseif ($row['status'] == 'In Progress') echo 'badge-primary';
-                                    elseif ($row['status'] == 'Completed') echo 'badge-success';
-                                ?>">
-                                <?php echo $row['status']; ?>
-                            </span>
-                        <?php endif; ?>
-                    </td>
-                    <td>
-                        <?php if ($isNewOrder): ?>
-                            <div class="btn-group" role="group">
-                                <button class="btn btn-info" data-toggle="modal" data-target="#editModal<?php echo $row['order_id']; ?>">Edit</button>
-                                <button class="btn btn-danger" data-toggle="modal" data-target="#deleteModal<?php echo $row['order_id']; ?>">Delete</button>
-                            </div>
-                        <?php endif; ?>
-                    </td>
-                </tr>
-                         <!-- Modal for Editing Status -->
-         <div class="modal fade" id="editModal<?php echo $row['order_id']; ?>" tabindex="-1" role="dialog" aria-labelledby="editModalLabel<?php echo $row['order_id']; ?>" aria-hidden="true">
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="editModalLabel<?php echo $row['order_id']; ?>">Edit Order Status</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <form method="POST" action="update_order_status.php">
-                                    <input type="hidden" name="order_id" value="<?php echo $row['order_id']; ?>">
-                                    <div class="form-group">
-                                        <label for="status">Select New Status:</label>
-                                        <select name="status" class="form-control" required>
-                                            <option value="Pending" <?php if ($row['status'] == 'Pending') echo 'selected'; ?>>Pending</option>
-                                            <option value="In Progress" <?php if ($row['status'] == 'In Progress') echo 'selected'; ?>>In Progress</option>
-                                            <option value="Completed" <?php if ($row['status'] == 'Completed') echo 'selected'; ?>>Completed</option>
-                                        </select>       
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                        <button type="submit" name="update_status" class="btn btn-primary">Update Status</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
+$currentOrderId = null;
+while ($row = $result->fetch_assoc()): 
+    $isNewOrder = $currentOrderId !== $row['order_id'];
+    if ($isNewOrder) {
+        if ($currentOrderId !== null) {
+            // Close previous order group with total row
+            echo "<tr>
+                    <td colspan='9' class='text-right font-weight-bold'>Total Order Price:</td>
+                    <td class='text-right'>" . number_format($orderTotal, 2) . "</td>
+                  </tr>";
+        }
+        $currentOrderId = $row['order_id'];
+        $orderTotal = $row['order_total'];
+    }
+    
+    // Get the forecasted quantity for the item
+    $forecastQuantity = isset($forecastResults[$row['item_id']]) ? $forecastResults[$row['item_id']] : 0;
+?>
+<tr>
+    <td><?php echo $isNewOrder ? $row['order_id'] : ''; ?></td>
+    <td><?php echo $isNewOrder ? $row['customer_name'] : ''; ?></td>
+    <td><?php echo $isNewOrder ? $row['table_num'] : ''; ?></td>
+    <td><?php echo $row['item_name']; ?></td>
+    <td><?php echo $row['quantity']; ?></td>
+    <td class="text-right"><?php echo number_format($row['item_total'], 2); ?></td>
+    <td class="text-right"><?php echo $isNewOrder ? number_format($orderTotal, 2) : ''; ?></td>
+    <td><?php echo $isNewOrder ? $row['order_date'] : ''; ?></td>
+    <td>
+        <?php if ($isNewOrder): ?>
+            <span class="badge 
+                <?php 
+                    if ($row['status'] == 'Pending') echo 'badge-warning';
+                    elseif ($row['status'] == 'In Progress') echo 'badge-primary';
+                    elseif ($row['status'] == 'Completed') echo 'badge-success';
+                ?>">
+                <?php echo $row['status']; ?>
+            </span>
+        <?php endif; ?>
+    </td>
+    <td class="text-right"><?php echo $forecastQuantity; ?></td> <!-- New Column Data -->
+    <td>
+        <?php if ($isNewOrder): ?>
+            <div class="btn-group" role="group">
+                <button class="btn btn-info" data-toggle="modal" data-target="#editModal<?php echo $row['order_id']; ?>">Edit</button>
+                <button class="btn btn-danger" data-toggle="modal" data-target="#deleteModal<?php echo $row['order_id']; ?>">Delete</button>
+            </div>
+        <?php endif; ?>
+    </td>
+</tr>
+<?php endwhile; ?>
 
-                    <!-- Modal for Deleting Order -->
-                    <div class="modal fade" id="deleteModal<?php echo $row['order_id']; ?>" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel<?php echo $row['order_id']; ?>" aria-hidden="true">
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="deleteModalLabel<?php echo $row['order_id']; ?>">Delete Order</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <form method="POST" action="delete_order.php">
-                                    <input type="hidden" name="order_id" value="<?php echo $row['order_id']; ?>">
-                                    <div class="modal-body">
-                                        <p>Are you sure you want to delete this order?</p>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                        <button type="submit" name="delete_order" class="btn btn-danger">Delete Order</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-
-            <?php endwhile; ?>
-
-            
-            </tbody>
-        </table>
-    <?php else: ?>
-        <p>No orders found.</p>
-    <?php endif; ?>
+<!-- After the loop -->
+<?php if ($currentOrderId !== null): ?>
+    <tr>
+        <td colspan='9' class='text-right font-weight-bold'>Total Order Price:</td>
+        <td class='text-right'><?php echo number_format($orderTotal, 2); ?></td>
+    </tr>
+<?php endif; ?>
+</tbody>
+</table>
+<?php else: ?>
+    <p>No orders found.</p>
+<?php endif; ?>
 </div>
 
-<!-- Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 </body>
 </html>
 
 <?php
 $conn->close();
 ?>
-
-

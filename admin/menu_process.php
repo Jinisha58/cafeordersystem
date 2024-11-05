@@ -20,13 +20,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Display success message and redirect to the dashboard
         echo "<script>
                 alert('New record created successfully');
-                window.location.href = 'dashboard.php';
+                window.location.href = 'add_items.php';
               </script>";
     } else {
         // Display error message and redirect to the dashboard
         echo "<script>
                 alert('Error: " . $stmt->error . "');
-                window.location.href = 'dashboard.php';
+                window.location.href = 'add_items.php';
               </script>";
     }
 

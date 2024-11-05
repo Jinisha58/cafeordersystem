@@ -138,6 +138,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
   <div class="sidebar">
     <h2>Dashboard</h2>
     <ul>
+      <li><a href="sales_trend.php">Sales Trend</a></li>
       <li><a href="admin_tables.php">Tables</a></li>
       <li><a href="add_items.php">Menu</a></li>
       <li><a href="customer_orders.php">Customer</a></li> 

@@ -86,7 +86,7 @@ if ($result === false) {
         <select id="status" name="status" required>
             <option value="available">Available</option>
             <option value="occupied">Occupied</option>
-            <option value="booked">Booked</option>
+            
         </select>
 
         <input type="submit" value="Add Table" class="btn btn-success">
